@@ -157,6 +157,55 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     }
   }
 
+  Future<void> sendFollowUpPrompt(String prompt, AIModel model) async {
+    if (prompt.trim().isEmpty) return;
+
+    await _cancelCurrentStreams();
+
+    // Add user message immediately and update state
+    final conversation = state.currentConversation ?? _createNewConversation();
+    final userMessage = Message(
+      id: _uuid.v4(),
+      content: prompt,
+      role: MessageRole.user,
+      timestamp: DateTime.now(),
+    );
+    conversation.messages.add(userMessage);
+
+    state = state.copyWith(
+      isProcessing: true,
+      currentResponses: {},
+      currentConversation: conversation,
+    );
+
+    _sendSingleModelPrompt(prompt, conversation.messages, model);
+  }
+
+  void _sendSingleModelPrompt(
+    String prompt,
+    List<Message> conversationHistory,
+    AIModel model,
+  ) {
+    final controller = _responseHandler.sendPromptToModel(
+      prompt: prompt,
+      conversationHistory: conversationHistory,
+      model: model,
+    );
+
+    _currentSubscriptions = {
+      model: controller.stream.listen(
+        (response) {
+          state = state.copyWith(currentResponses: {model: response});
+        },
+        onDone: _finalizeAssistantMessage,
+        onError: (error) {
+          _finalizeAssistantMessage();
+          state = state.copyWith(error: 'An error occurred: $error');
+        },
+      ),
+    };
+  }
+
   void _finalizeAssistantMessage() {
     if (state.currentResponses.isEmpty) {
       state = state.copyWith(isProcessing: false);

@@ -102,15 +102,11 @@ class _ModelResponseCardState extends State<ModelResponseCard>
                           fontFamily: 'Poly',
                         ),
                       ),
-                      if (widget.isFastest)
+                      if (widget.isFastest || widget.isFast)
                         const Icon(
                           CupertinoIcons.bolt_fill,
                           color: CupertinoColors.activeOrange,
-                        ),
-                      if (widget.isFast)
-                        const Icon(
-                          CupertinoIcons.bolt_fill,
-                          color: CupertinoColors.systemYellow,
+                          size: 18,
                         ),
                     ],
                   ),

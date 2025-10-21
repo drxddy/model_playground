@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:okara_chat/models/model_response.dart';
+import 'package:okara_chat/providers/chat_state_provider.dart';
+import 'package:okara_chat/services/ai_gateway_service.dart';
 import 'package:okara_chat/widgets/model_response_card.dart';
 
 class ModelResponsesView extends StatefulWidget {
@@ -19,12 +22,16 @@ class ModelResponsesView extends StatefulWidget {
 class _ModelResponsesViewState extends State<ModelResponsesView> {
   AIModel? _expandedModel;
 
+  List<String> _followUpSuggestions = [];
+  bool _isLoadingSuggestions = false;
+
   @override
   void initState() {
     super.initState();
     // If there is only one response, expand it by default.
     if (widget.responses.length == 1) {
       _expandedModel = widget.responses.keys.first;
+      _fetchFollowUpSuggestions();
     }
   }
 
@@ -37,10 +44,50 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     setState(() {
       if (_expandedModel == model) {
         _expandedModel = null;
+        _followUpSuggestions = [];
       } else {
         _expandedModel = model;
+        _fetchFollowUpSuggestions();
       }
     });
+  }
+
+  Future<void> _fetchFollowUpSuggestions() async {
+    if (_expandedModel == null) return;
+
+    setState(() {
+      _isLoadingSuggestions = true;
+      _followUpSuggestions = [];
+    });
+
+    final gatewayService = AIGatewayService();
+    final conversationHistory =
+        ProviderScope.containerOf(
+          context,
+          listen: false,
+        ).read(chatStateProvider).currentConversation?.messages ??
+        [];
+
+    final messages = conversationHistory
+        .map(
+          (m) => {
+            'role': m.role.toString().split('.').last,
+            'content': m.content,
+          },
+        )
+        .toList();
+
+    final suggestions = await gatewayService.getFollowUpSuggestions(
+      model: _expandedModel!,
+      messages: messages,
+    );
+
+    if (mounted) {
+      setState(() {
+        _followUpSuggestions = suggestions;
+        _isLoadingSuggestions = false;
+      });
+    }
   }
 
   Alignment get _alignment {
@@ -155,6 +202,38 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
             );
           }).toList(),
         ),
+        const SizedBox(height: 16.0),
+        if (_isLoadingSuggestions)
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CupertinoActivityIndicator(),
+          ),
+        if (_followUpSuggestions.isNotEmpty)
+          Wrap(
+            spacing: 8.0,
+            runSpacing: 8.0,
+            alignment: WrapAlignment.center,
+            children: _followUpSuggestions.map((suggestion) {
+              return CupertinoButton(
+                onPressed: () {
+                  final notifier = ProviderScope.containerOf(
+                    context,
+                    listen: false,
+                  ).read(chatStateProvider.notifier);
+                  notifier.sendFollowUpPrompt(suggestion, _expandedModel!);
+                },
+                color: CupertinoColors.systemGrey5,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                child: Text(
+                  suggestion,
+                  style: const TextStyle(color: CupertinoColors.black),
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }

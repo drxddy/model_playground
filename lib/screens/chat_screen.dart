@@ -68,25 +68,36 @@ class ChatScreen extends ConsumerWidget {
                   if (index == messages.length && currentResponses.isNotEmpty) {
                     return ModelResponsesView(
                       index: index,
-                      responses: currentResponses);
+                      responses: currentResponses,
+                    );
                   }
 
                   final message = messages[index];
                   if (message.role == MessageRole.user) {
                     return Align(
                       alignment: Alignment.centerRight,
-                      child: Card(
+                      child: Container(
                         margin: const EdgeInsets.fromLTRB(60, 8, 0, 20),
-                        color: Colors.white.withOpacity(0.9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            message.content,
-                            style: const TextStyle(color: Colors.black87),
+                        padding: const EdgeInsets.all(12.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(18),
+                            topRight: Radius.circular(18),
+                            bottomLeft: Radius.circular(18),
+                            bottomRight: Radius.circular(4),
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          message.content,
+                          style: const TextStyle(color: Colors.black87),
                         ),
                       ),
                     );
@@ -95,8 +106,9 @@ class ChatScreen extends ConsumerWidget {
                     return Column(
                       children: [
                         ModelResponsesView(
-                            index: index,
-                          responses: message.responses!),
+                          index: index,
+                          responses: message.responses!,
+                        ),
                         const SizedBox(height: 20),
                       ],
                     );

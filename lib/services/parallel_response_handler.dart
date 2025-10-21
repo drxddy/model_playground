@@ -53,6 +53,22 @@ class ParallelResponseHandler {
     return controller;
   }
 
+  StreamController<ModelResponse> sendPromptToModel({
+    required String prompt,
+    required List<Message> conversationHistory,
+    required AIModel model,
+  }) {
+    final controller = StreamController<ModelResponse>();
+    _streamModelResponse(
+      model: model,
+      prompt: prompt,
+      conversationHistory: conversationHistory,
+      controller: controller,
+      isFast: false, // Ensure we don't use the fast model for single prompts
+    );
+    return controller;
+  }
+
   Future<void> _streamModelResponse({
     required AIModel model,
     required String prompt,
