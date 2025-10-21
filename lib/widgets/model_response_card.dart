@@ -7,6 +7,7 @@ class ModelResponseCard extends StatefulWidget {
   final bool isExpanded;
   final VoidCallback onTap;
   final bool isFast;
+  final bool isFastest;
 
   const ModelResponseCard({
     super.key,
@@ -14,6 +15,7 @@ class ModelResponseCard extends StatefulWidget {
     this.isExpanded = false,
     required this.onTap,
     this.isFast = false,
+    this.isFastest = false,
   });
 
   @override
@@ -100,6 +102,11 @@ class _ModelResponseCardState extends State<ModelResponseCard>
                           fontFamily: 'Poly',
                         ),
                       ),
+                      if (widget.isFastest)
+                        const Icon(
+                          CupertinoIcons.bolt_fill,
+                          color: CupertinoColors.activeOrange,
+                        ),
                       if (widget.isFast)
                         const Icon(
                           CupertinoIcons.bolt_fill,

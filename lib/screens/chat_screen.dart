@@ -92,9 +92,14 @@ class ChatScreen extends ConsumerWidget {
                     );
                   } else if (message.role == MessageRole.assistant &&
                       message.responses != null) {
-                    return ModelResponsesView(
-                        index: index,
-                      responses: message.responses!);
+                    return Column(
+                      children: [
+                        ModelResponsesView(
+                            index: index,
+                          responses: message.responses!),
+                        const SizedBox(height: 20),
+                      ],
+                    );
                   }
                   return Container();
                 },

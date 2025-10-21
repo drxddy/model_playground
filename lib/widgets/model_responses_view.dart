@@ -6,9 +6,11 @@ class ModelResponsesView extends StatefulWidget {
   final int index;
   final Map<AIModel, ModelResponse> responses;
 
-  const ModelResponsesView({super.key, 
-  required this.index,
-  required this.responses});
+  const ModelResponsesView({
+    super.key,
+    required this.index,
+    required this.responses,
+  });
 
   @override
   State<ModelResponsesView> createState() => _ModelResponsesViewState();
@@ -51,14 +53,38 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     }
   }
 
+  bool get _allResponsesCompleted {
+    return widget.responses.isNotEmpty &&
+        widget.responses.values.every(
+          (r) => r.status == ResponseStatus.completed,
+        );
+  }
+
+  AIModel? get _fastestModel {
+    if (!_allResponsesCompleted) return null;
+
+    AIModel? fastestModel;
+    double maxTokensPerSec = 0;
+
+    widget.responses.forEach((model, response) {
+      if (response.latency > 0) {
+        final tokensPerSec = response.tokens / (response.latency / 1000);
+        if (tokensPerSec > maxTokensPerSec) {
+          maxTokensPerSec = tokensPerSec;
+          fastestModel = model;
+        }
+      }
+    });
+
+    return fastestModel;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       layoutBuilder: (currentChild, previousChildren) {
-        return Stack(
-          children: [if (currentChild != null) currentChild],
-        );
+        return Stack(children: [if (currentChild != null) currentChild]);
       },
       transitionBuilder: (Widget child, Animation<double> animation) {
         return FadeTransition(
@@ -77,16 +103,20 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
   }
 
   Widget _buildPreviewLayout() {
+    final fastestModel = _fastestModel;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 8.0,
       children: widget.responses.keys.map((model) {
         return Expanded(
-          child: ModelResponseCard(
-            response: widget.responses[model]!,
-            isExpanded: false,
-            onTap: () => _handleTap(model),
-            isFast: widget.responses.length == 1,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4.0),
+            child: ModelResponseCard(
+              response: widget.responses[model]!,
+              isExpanded: false,
+              onTap: () => _handleTap(model),
+              isFast: widget.responses.length == 1,
+              isFastest: model == fastestModel,
+            ),
           ),
         );
       }).toList(),
