@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:okara_chat/models/model_response.dart';
 import 'package:okara_chat/providers/chat_state_provider.dart';
 import 'package:okara_chat/services/ai_gateway_service.dart';
+import 'package:okara_chat/widgets/app_button.dart';
 import 'package:okara_chat/widgets/model_response_card.dart';
 
 class ModelResponsesView extends StatefulWidget {
@@ -31,7 +32,25 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     // If there is only one response, expand it by default.
     if (widget.responses.length == 1) {
       _expandedModel = widget.responses.keys.first;
-      _fetchFollowUpSuggestions();
+      if (widget.responses[_expandedModel!]?.status ==
+          ResponseStatus.completed) {
+        _fetchFollowUpSuggestions();
+      }
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ModelResponsesView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_expandedModel != null) {
+      final newResponse = widget.responses[_expandedModel!];
+      final oldResponse = oldWidget.responses[_expandedModel!];
+
+      if (newResponse?.status != oldResponse?.status &&
+          newResponse?.status == ResponseStatus.completed) {
+        _fetchFollowUpSuggestions();
+      }
     }
   }
 
@@ -47,7 +66,11 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
         _followUpSuggestions = [];
       } else {
         _expandedModel = model;
-        _fetchFollowUpSuggestions();
+        if (widget.responses[model]?.status == ResponseStatus.completed) {
+          _fetchFollowUpSuggestions();
+        } else {
+          _followUpSuggestions = [];
+        }
       }
     });
   }
@@ -214,22 +237,27 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
             runSpacing: 8.0,
             alignment: WrapAlignment.center,
             children: _followUpSuggestions.map((suggestion) {
-              return CupertinoButton(
-                onPressed: () {
+              return Button(
+                onTap: () {
                   final notifier = ProviderScope.containerOf(
                     context,
                     listen: false,
                   ).read(chatStateProvider.notifier);
                   notifier.sendFollowUpPrompt(suggestion, _expandedModel!);
                 },
-                color: CupertinoColors.systemGrey5,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-                child: Text(
-                  suggestion,
-                  style: const TextStyle(color: CupertinoColors.black),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: CupertinoColors.systemGrey5,
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 8,
+                  ),
+                  child: Text(
+                    suggestion,
+                    style: const TextStyle(color: CupertinoColors.black),
+                  ),
                 ),
               );
             }).toList(),
