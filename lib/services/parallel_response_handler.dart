@@ -98,7 +98,16 @@ class ParallelResponseHandler {
           if (data['choices'] != null && data['choices'].isNotEmpty) {
             final delta = data['choices'][0]['delta'];
             if (delta != null && delta['content'] != null) {
-              accumulatedContent += delta['content'];
+              final contentChunk = delta['content'] as String;
+              accumulatedContent += contentChunk;
+
+              final newTokens = _tokenCalculator.estimateCompletionTokens(
+                accumulatedContent,
+              );
+              final newLatency = DateTime.now()
+                  .difference(startTime)
+                  .inMilliseconds;
+
               controller.add(
                 ModelResponse(
                   id: responseId,
@@ -106,8 +115,8 @@ class ParallelResponseHandler {
                   content: accumulatedContent,
                   status: ResponseStatus.streaming,
                   cost: 0,
-                  latency: 0,
-                  tokens: 0,
+                  latency: newLatency,
+                  tokens: newTokens,
                 ),
               );
             }

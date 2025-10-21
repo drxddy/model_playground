@@ -22,6 +22,7 @@ class ChatScreen extends ConsumerWidget {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         shadowColor: Colors.transparent,
         toolbarHeight: 0,

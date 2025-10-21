@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:okara_chat/models/model_response.dart';
 
-class ModelResponseCard extends StatelessWidget {
+class ModelResponseCard extends StatefulWidget {
   final ModelResponse response;
   final bool isExpanded;
   final VoidCallback onTap;
@@ -17,12 +17,56 @@ class ModelResponseCard extends StatelessWidget {
   });
 
   @override
+  State<ModelResponseCard> createState() => _ModelResponseCardState();
+}
+
+class _ModelResponseCardState extends State<ModelResponseCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    );
+    _opacityAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+
+    if (widget.response.status == ResponseStatus.streaming) {
+      _animationController.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant ModelResponseCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.response.status != oldWidget.response.status) {
+      if (widget.response.status == ResponseStatus.streaming) {
+        _animationController.repeat(reverse: true);
+      } else {
+        _animationController.stop();
+        _animationController.value = 1.0;
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
     return Column(
       children: [
         GestureDetector(
-          onTap: onTap,
+          onTap: widget.onTap,
           child: Container(
             padding: const EdgeInsets.all(16.0),
             decoration: BoxDecoration(
@@ -32,7 +76,7 @@ class ModelResponseCard extends StatelessWidget {
                 BoxShadow(
                   color: CupertinoColors.black.withOpacity(0.1),
                   spreadRadius: 1,
-                  blurRadius: isExpanded ? 8 : 2,
+                  blurRadius: widget.isExpanded ? 8 : 2,
                 ),
               ],
             ),
@@ -46,14 +90,17 @@ class ModelResponseCard extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        _getModelName(response.model, isFast: isFast),
+                        _getModelName(
+                          widget.response.model,
+                          isFast: widget.isFast,
+                        ),
                         style: theme.textTheme.navTitleTextStyle.copyWith(
                           fontWeight: FontWeight.bold,
                           color: theme.primaryColor,
                           fontFamily: 'Poly',
                         ),
                       ),
-                      if (isFast)
+                      if (widget.isFast)
                         const Icon(
                           CupertinoIcons.bolt_fill,
                           color: CupertinoColors.systemYellow,
@@ -64,7 +111,7 @@ class ModelResponseCard extends StatelessWidget {
                   AnimatedCrossFade(
                     firstChild: _buildPreviewContent(context),
                     secondChild: _buildExpandedContent(context),
-                    crossFadeState: isExpanded
+                    crossFadeState: widget.isExpanded
                         ? CrossFadeState.showSecond
                         : CrossFadeState.showFirst,
                     duration: const Duration(milliseconds: 300),
@@ -74,9 +121,9 @@ class ModelResponseCard extends StatelessWidget {
             ),
           ),
         ),
-        if (!isExpanded &&
-            (response.status == ResponseStatus.completed ||
-                response.status == ResponseStatus.streaming)) ...[
+        if (!widget.isExpanded &&
+            (widget.response.status == ResponseStatus.completed ||
+                widget.response.status == ResponseStatus.streaming)) ...[
           const SizedBox(height: 8.0),
           _buildMetrics(context),
         ],
@@ -86,7 +133,7 @@ class ModelResponseCard extends StatelessWidget {
 
   Widget _buildPreviewContent(BuildContext context) {
     return Text(
-      response.content,
+      widget.response.content,
       maxLines: 8,
       overflow: TextOverflow.ellipsis,
       style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
@@ -98,7 +145,7 @@ class ModelResponseCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GptMarkdown(
-          response.content,
+          widget.response.content,
           style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
         ),
         const SizedBox(height: 16.0),
@@ -108,22 +155,25 @@ class ModelResponseCard extends StatelessWidget {
   }
 
   Widget _buildMetrics(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: CupertinoColors.systemGrey5.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildMetricItem(context, 'Tokens', '${response.tokens}'),
-          _buildMetricItem(
-            context,
-            'Latency',
-            '${(response.latency / 1000).toStringAsFixed(1)}s',
-          ),
-        ],
+    return FadeTransition(
+      opacity: _opacityAnimation,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          color: CupertinoColors.systemGrey5.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildMetricItem(context, 'Tokens', '${widget.response.tokens}'),
+            _buildMetricItem(
+              context,
+              'Latency',
+              '${(widget.response.latency / 1000).toStringAsFixed(1)}s',
+            ),
+          ],
+        ),
       ),
     );
   }

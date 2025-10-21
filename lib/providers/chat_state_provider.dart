@@ -128,34 +128,33 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
       conversationHistory: conversationHistory,
     );
 
-    var doneCount = 0;
-    final totalStreams = controllers.length;
+    _currentSubscriptions?.values.forEach((sub) => sub.cancel());
+    _currentSubscriptions = {};
 
-    _currentSubscriptions = {
-      for (var model in controllers.keys)
-        model: controllers[model]!.stream.listen(
-          (response) {
-            final newResponses = Map.of(state.currentResponses);
-            newResponses[model] = response;
-            state = state.copyWith(currentResponses: newResponses);
-          },
-          onDone: () {
-            doneCount++;
-            if (doneCount == totalStreams) {
-              _finalizeAssistantMessage();
-            }
-          },
-          onError: (error) {
-            // Handle stream error
-            doneCount++;
-            if (doneCount == totalStreams) {
-              _finalizeAssistantMessage();
-            }
-            // Optionally update state with error info
-            state = state.copyWith(error: 'An error occurred: $error');
-          },
-        ),
-    };
+    for (var model in controllers.keys) {
+      _currentSubscriptions![model] = controllers[model]!.stream.listen(
+        (response) {
+          final newResponses = Map.of(state.currentResponses);
+          newResponses[model] = response;
+          state = state.copyWith(currentResponses: newResponses);
+        },
+        onDone: () {
+          _currentSubscriptions!.remove(model);
+          if (_currentSubscriptions!.isEmpty) {
+            _finalizeAssistantMessage();
+          }
+        },
+        onError: (error) {
+          // Handle stream error
+          _currentSubscriptions!.remove(model);
+          if (_currentSubscriptions!.isEmpty) {
+            _finalizeAssistantMessage();
+          }
+          // Optionally update state with error info
+          state = state.copyWith(error: 'An error occurred: $error');
+        },
+      );
+    }
   }
 
   void _finalizeAssistantMessage() {
