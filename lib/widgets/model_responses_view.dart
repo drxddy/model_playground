@@ -50,6 +50,7 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
   Widget _buildPreviewLayout() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 8.0,
       children: widget.responses.keys.map((model) {
         return Expanded(
           child: ModelResponseCard(

@@ -22,7 +22,6 @@ class ModelResponseCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: CupertinoColors.white.withOpacity(0.9),
@@ -75,7 +74,9 @@ class ModelResponseCard extends StatelessWidget {
       response.content,
       maxLines: 8,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
+      style: TextStyle(
+        color: CupertinoColors.black.withOpacity(0.8),
+      ),
     );
   }
 
@@ -85,7 +86,9 @@ class ModelResponseCard extends StatelessWidget {
       children: [
         GptMarkdown(
           response.content,
-          style: CupertinoTheme.of(context).textTheme.textStyle,
+          style: TextStyle(
+            color: CupertinoColors.black.withOpacity(0.8),
+          ),
         ),
         const SizedBox(height: 16.0),
         _buildMetrics(context),

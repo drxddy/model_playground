@@ -26,28 +26,36 @@ class ChatScreen extends ConsumerWidget {
         shadowColor: Colors.transparent,
         toolbarHeight: 0,
         backgroundColor: Colors.transparent,
+        titleSpacing: 0.0,
         elevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: true,
       ),
       body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
         decoration: AppTheme.gradientDecoration,
         child: Column(
           children: [
             SafeArea(
-              top: true,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset('assets/images/icon-black.webp', height: 42),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Okara',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/icon-black.webp', height: 42),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Okara',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poly',
+                        fontSize: 26,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Expanded(
@@ -65,7 +73,7 @@ class ChatScreen extends ConsumerWidget {
                     return Align(
                       alignment: Alignment.centerRight,
                       child: Card(
-                        margin: const EdgeInsets.fromLTRB(60, 8, 12, 20),
+                        margin: const EdgeInsets.fromLTRB(60, 8, 0, 20),
                         color: Colors.white.withOpacity(0.9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
