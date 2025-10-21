@@ -1,8 +1,6 @@
 import 'package:okara_chat/models/model_response.dart';
 
 class TokenCalculator {
-  // Rough estimation: 1 token ≈ 4 characters.
-  // For production, a more accurate tokenizer like `tiktoken` should be used.
   static const int _charsPerToken = 4;
 
   int estimatePromptTokens(String prompt) {
@@ -26,15 +24,12 @@ class TokenCalculator {
   }
 
   ModelPricing _getPricing(AIModel model) {
-    // Note: These prices are for demonstration and should be verified.
     switch (model) {
       case AIModel.openaiGpt4o:
         return ModelPricing(inputPerMillion: 5.0, outputPerMillion: 15.0);
       case AIModel.anthropicClaude:
         return ModelPricing(inputPerMillion: 3.0, outputPerMillion: 15.0);
       case AIModel.xaiGrok:
-        // Pricing for Grok-2 is not publicly available as of writing.
-        // Using a placeholder value.
         return ModelPricing(inputPerMillion: 7.0, outputPerMillion: 21.0);
     }
   }

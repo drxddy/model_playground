@@ -9,6 +9,7 @@ class AppTheme {
   ];
 
   static final ThemeData themeData = ThemeData(
+    fontFamily: 'Inter',
     colorScheme: ColorScheme.fromSeed(
       seedColor: const Color(0xFF2286D4),
       primary: const Color(0xFF2286D4),
@@ -16,6 +17,17 @@ class AppTheme {
       tertiary: const Color(0xFF68C7FE),
       surface: const Color(0xFFAAE5FF),
       brightness: Brightness.light,
+    ),
+    textTheme: const TextTheme(
+      displayLarge: TextStyle(fontFamily: 'Poly'),
+      displayMedium: TextStyle(fontFamily: 'Poly'),
+      displaySmall: TextStyle(fontFamily: 'Poly'),
+      headlineLarge: TextStyle(fontFamily: 'Poly'),
+      headlineMedium: TextStyle(fontFamily: 'Poly'),
+      headlineSmall: TextStyle(fontFamily: 'Poly'),
+      titleLarge: TextStyle(fontFamily: 'Poly'),
+      titleMedium: TextStyle(fontFamily: 'Poly'),
+      titleSmall: TextStyle(fontFamily: 'Poly'),
     ),
     useMaterial3: true,
   );

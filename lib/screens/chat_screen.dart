@@ -21,30 +21,33 @@ class ChatScreen extends ConsumerWidget {
     final isFastResponseMode = chatState.isFastResponseMode;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        shadowColor: Colors.transparent,
+        toolbarHeight: 0,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        centerTitle: true,
+      ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         decoration: AppTheme.gradientDecoration,
         child: Column(
           children: [
             SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset('assets/images/icon-black.webp', height: 30),
-                    const SizedBox(width: 10),
-                    const Text(
-                      'Okara Playground',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+              top: true,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset('assets/images/icon-black.webp', height: 42),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Okara',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             Expanded(
