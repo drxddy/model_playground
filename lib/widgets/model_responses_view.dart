@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:okara_chat/models/message.dart';
 import 'package:okara_chat/models/model_response.dart';
 import 'package:okara_chat/providers/chat_state_provider.dart';
 import 'package:okara_chat/services/ai_gateway_service.dart';
@@ -81,21 +82,31 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     });
 
     final gatewayService = AIGatewayService();
-    final conversationHistory =
-        ProviderScope.containerOf(
-          context,
-          listen: false,
-        ).read(chatStateProvider).currentConversation?.messages ??
-        [];
+    final chatState = ProviderScope.containerOf(
+      context,
+      listen: false,
+    ).read(chatStateProvider);
 
+    final conversationHistory =
+        chatState.value?.currentConversation?.messages ?? [];
+
+    // The last message in the history is the one from the assistant, which might
+    // be in the process of streaming. We need to replace its potentially
+    // incomplete content with the full content from the completed response.
+    // We also need to handle the case where the history is just the user's
+    // prompt and doesn't have an assistant message yet.
     final messages = conversationHistory
-        .map(
-          (m) => {
+        .take(conversationHistory.length - 1)
+        .map((m) {
+          return {
             'role': m.role.toString().split('.').last,
             'content': m.content,
-          },
-        )
+          };
+        })
         .toList();
+
+    // Add the completed assistant response.
+    messages.add({'role': 'assistant', 'content': response.content});
 
     final suggestions = await gatewayService.getFollowUpSuggestions(
       model: _expandedModel!,

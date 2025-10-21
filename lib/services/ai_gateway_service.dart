@@ -66,7 +66,11 @@ class AIGatewayService {
   }) async {
     const suggestionPrompt =
         'Based on the last message, suggest 3 short, concise follow-up questions a user might ask. Each suggestion should be on a new line, without any numbering or bullet points.';
-    final suggestionMessages = List<Map<String, dynamic>>.from(messages)
+    // Filter out messages with null or empty content, which can cause API errors.
+    final filteredMessages = messages
+        .where((m) => m['content'] != null && m['content']!.isNotEmpty)
+        .toList();
+    final suggestionMessages = List<Map<String, dynamic>>.from(filteredMessages)
       ..add({'role': 'user', 'content': suggestionPrompt});
 
     try {
@@ -114,9 +118,7 @@ class AIGatewayService {
       'Content-Type': 'application/json',
     };
     final body = jsonEncode({
-      'model': _getModelIdentifier(
-        model,
-      ), // Always use the specific model
+      'model': _getModelIdentifier(model), // Always use the specific model
       'messages': messages,
       'stream': isStreaming,
       'max_tokens': 1024,

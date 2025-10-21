@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
+  static const Color primaryColor = Color(0xFF2286D4);
+
   static const List<Color> gradientColors = [
     Color(0xFFAAE5FF),
     Color(0xFF68C7FE),

@@ -181,17 +181,29 @@ class ParallelResponseHandler {
   }
 
   List<Map<String, dynamic>> _buildMessageList(
-    List<Message> history,
-    String newPrompt,
+    List<Message> conversationHistory,
+    String prompt,
   ) {
-    final messages = history.map((message) {
-      return {
-        'role': message.role.toString().split('.').last,
-        'content': message.content,
-      };
+    final messages = conversationHistory.map((m) {
+      String? content = m.content;
+      // If the message is from the assistant and its main content is empty,
+      // it means it's a container for multiple model responses.
+      // We need to find the content from the specific model we are querying.
+      if (m.role == MessageRole.assistant &&
+          (content == null || content.isEmpty) &&
+          m.responses != null &&
+          m.responses!.isNotEmpty) {
+        // For follow-up prompts, we are targeting a single model.
+        // We find the content from that model's response.
+        // This is a bit of a hack, as we don't have the target model here.
+        // A better approach would be to pass the target model or have a primary response.
+        // For now, we'll take the first available response content.
+        content = m.responses!.values.first.content;
+      }
+      return {'role': m.role.toString().split('.').last, 'content': content};
     }).toList();
 
-    messages.add({'role': 'user', 'content': newPrompt});
+    // The prompt is the last user message, which is already in the history.
     return messages;
   }
 }

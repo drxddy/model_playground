@@ -1,37 +1,30 @@
-import 'package:sembast/sembast.dart';
-import '../../models/conversation.dart';
-import '../database_service.dart';
+import 'package:okara_chat/data/daos/conversation_dao.dart';
+import 'package:okara_chat/models/conversation.dart';
 
 class ConversationRepository {
-  final DatabaseService _dbService;
-  final _store = stringMapStoreFactory.store('conversations');
+  final ConversationDao _conversationDao;
 
-  ConversationRepository(this._dbService);
+  ConversationRepository(this._conversationDao);
 
   Future<void> saveConversation(Conversation conversation) async {
-    final db = await _dbService.database;
-    await _store.record(conversation.id).put(db, conversation.toJson());
+    // Check if conversation exists
+    final existing = await _conversationDao.getById(conversation.id);
+    if (existing != null) {
+      await _conversationDao.update(conversation);
+    } else {
+      await _conversationDao.insert(conversation);
+    }
   }
 
   Future<Conversation?> getConversation(String id) async {
-    final db = await _dbService.database;
-    final snapshot = await _store.record(id).get(db);
-    if (snapshot != null) {
-      return Conversation.fromJson(snapshot);
-    }
-    return null;
+    return await _conversationDao.getById(id);
   }
 
   Future<List<Conversation>> getAllConversations() async {
-    final db = await _dbService.database;
-    final snapshots = await _store.find(db);
-    return snapshots.map((snapshot) {
-      return Conversation.fromJson(snapshot.value);
-    }).toList();
+    return await _conversationDao.getAll();
   }
 
   Future<void> deleteConversation(String id) async {
-    final db = await _dbService.database;
-    await _store.record(id).delete(db);
+    await _conversationDao.delete(id);
   }
 }

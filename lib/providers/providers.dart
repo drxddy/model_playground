@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:okara_chat/data/daos/conversation_dao.dart';
 import 'package:okara_chat/data/database_service.dart';
 import 'package:okara_chat/data/repositories/conversation_repository.dart';
 import 'package:okara_chat/services/ai_gateway_service.dart';
@@ -9,9 +10,16 @@ final databaseServiceProvider = Provider<DatabaseService>((ref) {
   return DatabaseService();
 });
 
-final conversationRepositoryProvider = Provider<ConversationRepository>((ref) {
-  final dbService = ref.watch(databaseServiceProvider);
-  return ConversationRepository(dbService);
+final conversationDaoProvider = FutureProvider<ConversationDao>((ref) async {
+  final db = await ref.watch(databaseServiceProvider).database;
+  return ConversationDao(db);
+});
+
+final conversationRepositoryProvider = FutureProvider<ConversationRepository>((
+  ref,
+) async {
+  final conversationDao = await ref.watch(conversationDaoProvider.future);
+  return ConversationRepository(conversationDao);
 });
 
 final aiGatewayServiceProvider = Provider<AIGatewayService>((ref) {
