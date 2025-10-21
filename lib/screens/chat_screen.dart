@@ -21,37 +21,35 @@ class ChatScreen extends ConsumerWidget {
     final isFastResponseMode = chatState.isFastResponseMode;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        shadowColor: Colors.transparent,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/icon-black.webp', height: 30),
-            const SizedBox(width: 10),
-            const Text(
-              'Okara Playground',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-      ),
       body: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         decoration: AppTheme.gradientDecoration,
         child: Column(
           children: [
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset('assets/images/icon-black.webp', height: 30),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Okara Playground',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             Expanded(
               child: ListView.builder(
-                padding: EdgeInsets.only(
-                  top: kToolbarHeight + MediaQuery.of(context).padding.top,
-                  bottom: 10,
-                ),
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
                 itemCount:
                     messages.length + (currentResponses.isNotEmpty ? 1 : 0),
                 itemBuilder: (context, index) {
@@ -64,7 +62,7 @@ class ChatScreen extends ConsumerWidget {
                     return Align(
                       alignment: Alignment.centerRight,
                       child: Card(
-                        margin: const EdgeInsets.fromLTRB(60, 6, 12, 6),
+                        margin: const EdgeInsets.fromLTRB(60, 8, 12, 20),
                         color: Colors.white.withOpacity(0.9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
@@ -135,7 +133,9 @@ class ChatScreen extends ConsumerWidget {
                 padding: const EdgeInsets.only(left: 8.0),
                 child: Icon(
                   Icons.bolt,
-                  color: isFastResponseMode ? Colors.amber.shade700 : Colors.grey,
+                  color: isFastResponseMode
+                      ? Colors.amber.shade700
+                      : Colors.grey,
                 ),
               ),
             ),
@@ -160,7 +160,7 @@ class ChatScreen extends ConsumerWidget {
                 onTap: () {
                   notifier.stopStreaming();
                 },
-                child: const Icon(CupertinoIcons.stop_circle_fill, size: 32,),
+                child: const Icon(CupertinoIcons.stop_circle_fill, size: 32),
               )
             else
               GestureDetector(
@@ -170,7 +170,10 @@ class ChatScreen extends ConsumerWidget {
                     controller.clear();
                   }
                 },
-                child: const Icon(CupertinoIcons.arrow_up_circle_fill, size: 32,),
+                child: const Icon(
+                  CupertinoIcons.arrow_up_circle_fill,
+                  size: 32,
+                ),
               ),
           ],
         ),

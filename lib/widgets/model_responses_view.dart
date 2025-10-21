@@ -85,12 +85,12 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
               padding: const EdgeInsets.symmetric(horizontal: 8.0),
               child: CupertinoButton(
                 onPressed: () => _handleTap(model),
-                child: Text(_getModelName(model)),
                 color: CupertinoColors.systemGrey4,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 8,
                 ),
+                child: Text(_getModelName(model)),
               ),
             );
           }).toList(),

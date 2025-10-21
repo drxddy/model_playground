@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:gpt_markdown/gpt_markdown.dart';
 import 'package:okara_chat/models/model_response.dart';
 
@@ -23,7 +22,7 @@ class ModelResponseCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 4),
         padding: const EdgeInsets.all(16.0),
         decoration: BoxDecoration(
           color: CupertinoColors.white.withOpacity(0.9),
@@ -74,9 +73,9 @@ class ModelResponseCard extends StatelessWidget {
   Widget _buildPreviewContent(BuildContext context) {
     return Text(
       response.content,
-      maxLines: 3,
+      maxLines: 8,
       overflow: TextOverflow.ellipsis,
-      style: CupertinoTheme.of(context).textTheme.textStyle,
+      style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
     );
   }
 
