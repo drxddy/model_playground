@@ -16,7 +16,7 @@ Future<void> _bootstrap(void Function() runner) async {
   try {
     setStatusBarColor();
     setPreferredOrientation();
-    setNavigationBarTheme(Color(0xFF2286D4), true);
+    setNavigationBarTheme(AppTheme.gradientColors.last, true);
     setTransparentStatus();
   } catch (err) {
     print('Error occurred while setting up the app: $err');
@@ -56,7 +56,7 @@ void setStatusBarColor() {
       statusBarIconBrightness: Brightness.light,
       statusBarColor: Colors.transparent,
       systemNavigationBarDividerColor: Colors.transparent,
-      systemNavigationBarColor: Colors.black.withOpacity(0.002),
+      systemNavigationBarColor: AppTheme.gradientColors.last.withOpacity(0.002),
     ),
   );
 }

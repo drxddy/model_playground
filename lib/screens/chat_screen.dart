@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:okara_chat/models/message.dart';
@@ -128,19 +129,21 @@ class ChatScreen extends ConsumerWidget {
         ),
         child: Row(
           children: [
-            IconButton(
-              icon: Icon(
-                Icons.bolt,
-                color: isFastResponseMode ? Colors.amber.shade700 : Colors.grey,
+            GestureDetector(
+              onTap: () => notifier.toggleFastResponseMode(),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Icon(
+                  Icons.bolt,
+                  color: isFastResponseMode ? Colors.amber.shade700 : Colors.grey,
+                ),
               ),
-              onPressed: () => notifier.toggleFastResponseMode(),
-              tooltip: 'Fast Response Mode',
             ),
             Expanded(
               child: TextField(
                 controller: controller,
                 decoration: const InputDecoration(
-                  hintText: 'Enter your prompt...',
+                  hintText: 'How can I help you today?',
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.symmetric(horizontal: 10),
                 ),
@@ -153,23 +156,21 @@ class ChatScreen extends ConsumerWidget {
               ),
             ),
             if (isProcessing)
-              IconButton(
-                icon: const Icon(Icons.stop_circle_outlined),
-                onPressed: () => notifier.stopStreaming(),
-                color: Theme.of(context).colorScheme.primary,
-                tooltip: 'Stop',
+              GestureDetector(
+                onTap: () {
+                  notifier.stopStreaming();
+                },
+                child: const Icon(CupertinoIcons.stop_circle_fill, size: 32,),
               )
             else
-              IconButton(
-                icon: const Icon(Icons.send),
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   if (controller.text.isNotEmpty) {
                     notifier.sendPrompt(controller.text);
                     controller.clear();
                   }
                 },
-                color: Theme.of(context).colorScheme.primary,
-                tooltip: 'Send',
+                child: const Icon(CupertinoIcons.arrow_up_circle_fill, size: 32,),
               ),
           ],
         ),
