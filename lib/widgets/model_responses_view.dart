@@ -22,8 +22,6 @@ class ModelResponsesView extends StatefulWidget {
 
 class _ModelResponsesViewState extends State<ModelResponsesView> {
   AIModel? _expandedModel;
-
-  List<String> _followUpSuggestions = [];
   bool _isLoadingSuggestions = false;
 
   @override
@@ -63,13 +61,10 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     setState(() {
       if (_expandedModel == model) {
         _expandedModel = null;
-        _followUpSuggestions = [];
       } else {
         _expandedModel = model;
         if (widget.responses[model]?.status == ResponseStatus.completed) {
           _fetchFollowUpSuggestions();
-        } else {
-          _followUpSuggestions = [];
         }
       }
     });
@@ -78,9 +73,11 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
   Future<void> _fetchFollowUpSuggestions() async {
     if (_expandedModel == null) return;
 
+    final response = widget.responses[_expandedModel];
+    if (response == null || response.followUpSuggestions.isNotEmpty) return;
+
     setState(() {
       _isLoadingSuggestions = true;
-      _followUpSuggestions = [];
     });
 
     final gatewayService = AIGatewayService();
@@ -107,9 +104,17 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
 
     if (mounted) {
       setState(() {
-        _followUpSuggestions = suggestions;
         _isLoadingSuggestions = false;
       });
+      final notifier = ProviderScope.containerOf(
+        context,
+        listen: false,
+      ).read(chatStateProvider.notifier);
+      notifier.updateModelResponse(
+        widget.index,
+        _expandedModel!,
+        response.copyWith(followUpSuggestions: suggestions),
+      );
     }
   }
 
@@ -184,7 +189,7 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
               response: widget.responses[model]!,
               isExpanded: false,
               onTap: () => _handleTap(model),
-              isFast: widget.responses.length == 1,
+              isFast: model == AIModel.groqLlama31Instant,
               isFastest: model == fastestModel,
             ),
           ),
@@ -205,7 +210,7 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
           response: expandedResponse,
           isExpanded: true,
           onTap: () => _handleTap(_expandedModel!),
-          isFast: widget.responses.length == 1,
+          isFast: _expandedModel == AIModel.groqLlama31Instant,
         ),
         const SizedBox(height: 16.0),
         Row(
@@ -231,12 +236,12 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
             padding: EdgeInsets.all(8.0),
             child: CupertinoActivityIndicator(),
           ),
-        if (_followUpSuggestions.isNotEmpty)
+        if (expandedResponse.followUpSuggestions.isNotEmpty)
           Wrap(
             spacing: 8.0,
             runSpacing: 8.0,
             alignment: WrapAlignment.center,
-            children: _followUpSuggestions.map((suggestion) {
+            children: expandedResponse.followUpSuggestions.map((suggestion) {
               return Button(
                 onTap: () {
                   final notifier = ProviderScope.containerOf(

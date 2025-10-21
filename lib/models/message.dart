@@ -23,6 +23,22 @@ class Message {
       _$MessageFromJson(json);
 
   Map<String, dynamic> toJson() => _$MessageToJson(this);
+
+  Message copyWith({
+    String? id,
+    String? content,
+    MessageRole? role,
+    DateTime? timestamp,
+    Map<AIModel, ModelResponse>? responses,
+  }) {
+    return Message(
+      id: id ?? this.id,
+      content: content ?? this.content,
+      role: role ?? this.role,
+      timestamp: timestamp ?? this.timestamp,
+      responses: responses ?? this.responses,
+    );
+  }
 }
 
 enum MessageRole { user, assistant }

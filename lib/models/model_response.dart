@@ -11,6 +11,7 @@ class ModelResponse {
   final double cost;
   final int latency;
   final int tokens;
+  final List<String> followUpSuggestions;
 
   ModelResponse({
     required this.id,
@@ -20,6 +21,7 @@ class ModelResponse {
     required this.cost,
     required this.latency,
     required this.tokens,
+    this.followUpSuggestions = const [],
   });
 
   factory ModelResponse.fromJson(Map<String, dynamic> json) =>
@@ -35,6 +37,7 @@ class ModelResponse {
     double? cost,
     int? latency,
     int? tokens,
+    List<String>? followUpSuggestions,
   }) {
     return ModelResponse(
       id: id ?? this.id,
@@ -44,6 +47,7 @@ class ModelResponse {
       cost: cost ?? this.cost,
       latency: latency ?? this.latency,
       tokens: tokens ?? this.tokens,
+      followUpSuggestions: followUpSuggestions ?? this.followUpSuggestions,
     );
   }
 }

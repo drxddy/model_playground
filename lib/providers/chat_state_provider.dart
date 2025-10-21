@@ -102,6 +102,35 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     }
   }
 
+  void updateModelResponse(
+    int messageIndex,
+    AIModel model,
+    ModelResponse response,
+  ) {
+    if (state.currentConversation == null) return;
+
+    final conversation = state.currentConversation!;
+    if (messageIndex >= conversation.messages.length) return;
+
+    final message = conversation.messages[messageIndex];
+
+    if (message.role == MessageRole.assistant) {
+      final newResponses = Map<AIModel, ModelResponse>.from(
+        message.responses ?? {},
+      );
+      newResponses[model] = response;
+
+      final newMessage = message.copyWith(responses: newResponses);
+
+      final newMessages = List<Message>.from(conversation.messages);
+      newMessages[messageIndex] = newMessage;
+
+      final newConversation = conversation.copyWith(messages: newMessages);
+
+      state = state.copyWith(currentConversation: newConversation);
+    }
+  }
+
   void _sendFastPrompt(String prompt, List<Message> conversationHistory) {
     final controller = _responseHandler.sendPromptToFastModel(
       prompt: prompt,
@@ -111,7 +140,9 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     _currentSubscriptions = {
       AIModel.groqLlama31Instant: controller.stream.listen(
         (response) {
-          state = state.copyWith(currentResponses: {AIModel.groqLlama31Instant: response});
+          state = state.copyWith(
+            currentResponses: {AIModel.groqLlama31Instant: response},
+          );
         },
         onDone: _finalizeAssistantMessage,
         onError: (error) {

@@ -19,4 +19,16 @@ class Conversation {
       _$ConversationFromJson(json);
 
   Map<String, dynamic> toJson() => _$ConversationToJson(this);
+
+  Conversation copyWith({
+    String? id,
+    List<Message>? messages,
+    DateTime? createdAt,
+  }) {
+    return Conversation(
+      id: id ?? this.id,
+      messages: messages ?? this.messages,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
 }

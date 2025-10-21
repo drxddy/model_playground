@@ -15,6 +15,11 @@ ModelResponse _$ModelResponseFromJson(Map<String, dynamic> json) =>
       cost: (json['cost'] as num).toDouble(),
       latency: (json['latency'] as num).toInt(),
       tokens: (json['tokens'] as num).toInt(),
+      followUpSuggestions:
+          (json['followUpSuggestions'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$ModelResponseToJson(ModelResponse instance) =>
@@ -26,12 +31,13 @@ Map<String, dynamic> _$ModelResponseToJson(ModelResponse instance) =>
       'cost': instance.cost,
       'latency': instance.latency,
       'tokens': instance.tokens,
+      'followUpSuggestions': instance.followUpSuggestions,
     };
 
 const _$AIModelEnumMap = {
   AIModel.openaiGpt4o: 'openai/gpt-4o',
   AIModel.anthropicClaude: 'anthropic/claude-3-5-sonnet',
-  AIModel.xaiGrok: 'x-ai/grok-4',
+  AIModel.xaiGrok: 'xai/grok-3',
   AIModel.groqLlama31Instant: 'groq/llama-3.1-8b-instant',
 };
 
