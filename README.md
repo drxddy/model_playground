@@ -23,6 +23,12 @@ Follows clean architecture, separating concerns into distinct layers:
 
 -   **Local Conversation Caching**: To provide a persistent chat history, all conversations are cached locally using **Sembast**, a lightweight NoSQL database. A `DatabaseService` and associated DAOs manage the storage and retrieval of messages and conversations.
 
+## Screenshots
+
+| Side-by-Side Comparison | SSE Streaming | Markdown Formatting | Follow-up Suggestions | Conversation History | Fast Response Mode |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| ![Side-by-Side Model Output and Perf](assets/screenshots/Side-by-Side%20Model%20Output%20and%20Perf.png) | ![SSE Output Streaming with Stop Option](assets/screenshots/SSE%20Output%20Streaming%20with%20Stop%20Option.png) | ![Markdown Formatting](assets/screenshots/Markdown%20Formatting.png) | ![Followup Suggestions](assets/screenshots/Followup%20Suggestions.png) | ![Conversation History](assets/screenshots/Conversation%20History.png) | ![Fast Response Mode With Groq llama](assets/screenshots/Fast%20Response%20Mode%20With%20Groq%20llama.png) |
+
 ## File Structure
 
 The project is organized into the following directories:

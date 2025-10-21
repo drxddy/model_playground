@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:okara_chat/models/conversation.dart';
 import 'package:okara_chat/providers/chat_state_provider.dart';
 import 'package:okara_chat/providers/providers.dart';
-import 'package:okara_chat/screens/chat_screen.dart';
 import 'package:okara_chat/utils/app_theme.dart';
-
-final conversationsProvider = FutureProvider<List<Conversation>>((ref) async {
-  final repository = await ref.watch(conversationRepositoryProvider.future);
-  return repository.getAllConversations();
-});
 
 class ConversationsScreen extends ConsumerWidget {
   const ConversationsScreen({super.key});
@@ -22,12 +15,24 @@ class ConversationsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Conversations'),
         backgroundColor: AppTheme.primaryColor,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              ref.read(chatStateProvider.notifier).createNewConversation();
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
       ),
       body: conversationsAsyncValue.when(
         data: (conversations) {
           if (conversations.isEmpty) {
             return const Center(child: Text('No conversations yet.'));
           }
+          // Sort conversations by creation date, newest first
+          conversations.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
           return ListView.builder(
             itemCount: conversations.length,
             itemBuilder: (context, index) {
@@ -45,9 +50,7 @@ class ConversationsScreen extends ConsumerWidget {
                   ref
                       .read(chatStateProvider.notifier)
                       .loadConversation(conversation.id);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const ChatScreen()),
-                  );
+                  Navigator.of(context).pop();
                 },
                 trailing: IconButton(
                   icon: const Icon(Icons.delete_outline),
@@ -77,7 +80,7 @@ class ConversationsScreen extends ConsumerWidget {
                         conversationRepositoryProvider.future,
                       );
                       await repo.deleteConversation(conversation.id);
-                      ref.invalidate(conversationsProvider);
+                      // No need to invalidate, StreamProvider will handle it
                     }
                   },
                 ),

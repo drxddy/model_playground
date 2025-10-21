@@ -27,4 +27,8 @@ class ConversationRepository {
   Future<void> deleteConversation(String id) async {
     await _conversationDao.delete(id);
   }
+
+  Stream<List<Conversation>> watchAllConversations() {
+    return _conversationDao.watchAll();
+  }
 }

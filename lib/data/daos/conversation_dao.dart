@@ -34,4 +34,15 @@ class ConversationDao {
       return Conversation.fromJson(snapshot.value);
     }).toList();
   }
+
+  Stream<List<Conversation>> watchAll() {
+    return _store
+        .query(finder: Finder(sortOrders: [SortOrder('createdAt', false)]))
+        .onSnapshots(_db)
+        .map((snapshots) {
+          return snapshots
+              .map((snapshot) => Conversation.fromJson(snapshot.value))
+              .toList();
+        });
+  }
 }
