@@ -42,12 +42,12 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
   }
 
   Alignment get _alignment {
-    if (widget.index == 0) {
+    if (_expandedModel?.index == 0) {
       return Alignment.topLeft;
-    } else if (widget.index == 1) {
-      return Alignment.topCenter;
-    } else {
+    } else if (_expandedModel?.index == 2) {
       return Alignment.topRight;
+    } else {
+      return Alignment.topCenter;
     }
   }
 

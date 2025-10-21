@@ -19,58 +19,68 @@ class ModelResponseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CupertinoTheme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16.0),
-        decoration: BoxDecoration(
-          color: CupertinoColors.white.withOpacity(0.9),
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: CupertinoColors.black.withOpacity(0.1),
-              spreadRadius: 1,
-              blurRadius: isExpanded ? 8 : 2,
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: CupertinoColors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: CupertinoColors.black.withOpacity(0.1),
+                  spreadRadius: 1,
+                  blurRadius: isExpanded ? 8 : 2,
+                ),
+              ],
             ),
-          ],
-        ),
-        child: AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _getModelName(response.model, isFast: isFast),
-                    style: theme.textTheme.navTitleTextStyle.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.primaryColor,
-                      fontFamily: 'Poly',
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _getModelName(response.model, isFast: isFast),
+                        style: theme.textTheme.navTitleTextStyle.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.primaryColor,
+                          fontFamily: 'Poly',
+                        ),
+                      ),
+                      if (isFast)
+                        const Icon(
+                          CupertinoIcons.bolt_fill,
+                          color: CupertinoColors.systemYellow,
+                        ),
+                    ],
                   ),
-                  if (isFast)
-                    const Icon(
-                      CupertinoIcons.bolt_fill,
-                      color: CupertinoColors.systemYellow,
-                    ),
+                  const SizedBox(height: 8.0),
+                  AnimatedCrossFade(
+                    firstChild: _buildPreviewContent(context),
+                    secondChild: _buildExpandedContent(context),
+                    crossFadeState: isExpanded
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
+                    duration: const Duration(milliseconds: 300),
+                  ),
                 ],
               ),
-              const SizedBox(height: 8.0),
-              AnimatedCrossFade(
-                firstChild: _buildPreviewContent(context),
-                secondChild: _buildExpandedContent(context),
-                crossFadeState: isExpanded
-                    ? CrossFadeState.showSecond
-                    : CrossFadeState.showFirst,
-                duration: const Duration(milliseconds: 300),
-              ),
-            ],
+            ),
           ),
         ),
-      ),
+        if (!isExpanded &&
+            (response.status == ResponseStatus.completed ||
+                response.status == ResponseStatus.streaming)) ...[
+          const SizedBox(height: 8.0),
+          _buildMetrics(context),
+        ],
+      ],
     );
   }
 
@@ -107,8 +117,12 @@ class ModelResponseCard extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildMetricItem(context, 'Tokens', '${response.tokens}T'),
-          _buildMetricItem(context, 'Latency', '${response.latency} ms'),
+          _buildMetricItem(context, 'Tokens', '${response.tokens}'),
+          _buildMetricItem(
+            context,
+            'Latency',
+            '${(response.latency / 1000).toStringAsFixed(1)}s',
+          ),
         ],
       ),
     );
