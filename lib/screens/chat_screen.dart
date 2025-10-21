@@ -194,13 +194,13 @@ class ChatScreen extends ConsumerWidget {
                         ),
                       ),
                       chatState.isProcessing
-                          ? IconButton(
-                              icon: const Icon(Icons.stop_circle_outlined),
-                              onPressed: () => chatNotifier.stopStreaming(),
+                          ? GestureDetector(
+                              child: const Icon(CupertinoIcons.stop_circle_fill, size: 32),
+                              onTap: () => chatNotifier.stopStreaming(),
                             )
-                          : IconButton(
-                              icon: const Icon(Icons.send),
-                              onPressed: () {
+                          : GestureDetector(
+                              child: const Icon(CupertinoIcons.arrow_up_circle_fill, size: 32),
+                              onTap: () {
                                 if (textController.text.isNotEmpty) {
                                   chatNotifier.sendPrompt(textController.text);
                                   textController.clear();

@@ -84,7 +84,6 @@ class ChatState {
 class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
   final ParallelResponseHandler _responseHandler;
   final ConversationRepository? _repository;
-  final Ref _ref;
   final _uuid = const Uuid();
 
   Map<AIModel, StreamSubscription>? _currentSubscriptions;
@@ -95,7 +94,6 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
     required Ref ref,
   }) : _responseHandler = responseHandler,
        _repository = repository,
-       _ref = ref,
        super(const AsyncValue.loading()) {
     _loadInitialConversation();
   }
@@ -106,7 +104,7 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
       return;
     }
     try {
-      final conversations = await _repository!.getAllConversations();
+      final conversations = await _repository.getAllConversations();
       if (conversations.isNotEmpty) {
         conversations.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         state = AsyncValue.data(
@@ -154,7 +152,7 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
     if (_repository == null) return;
     _cancelCurrentStreams();
     final newConversation = _createNewConversation();
-    _repository!.saveConversation(newConversation);
+    _repository.saveConversation(newConversation);
     state = AsyncValue.data(ChatState(currentConversation: newConversation));
   }
 
@@ -183,7 +181,7 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
     );
     conversation.messages.add(userMessage);
 
-    await _repository!.saveConversation(conversation);
+    await _repository.saveConversation(conversation);
 
     state = AsyncValue.data(
       state.value!.copyWith(
@@ -216,7 +214,7 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
     );
     conversation.messages.add(userMessage);
 
-    await _repository!.saveConversation(conversation);
+    await _repository.saveConversation(conversation);
 
     state = AsyncValue.data(
       state.value!.copyWith(
@@ -296,8 +294,36 @@ class ChatStateNotifier extends StateNotifier<AsyncValue<ChatState>> {
   }
 
   void _sendFastPrompt(String prompt, List<Message> messages) {
-    // Placeholder for fast response logic
-    _finalizeAssistantMessage();
+    const fastModel = AIModel.groqLlama31Instant;
+    final controller = _responseHandler.sendPromptToModel(
+      prompt: prompt,
+      conversationHistory: messages,
+      model: fastModel,
+    );
+
+    _currentSubscriptions = {
+      fastModel: controller.stream.listen(
+        (response) {
+          state.whenData((value) {
+            final currentResponses = Map<AIModel, ModelResponse>.from(
+              value.currentResponses,
+            );
+            currentResponses[fastModel] = response;
+            state = AsyncValue.data(
+              value.copyWith(currentResponses: currentResponses),
+            );
+          });
+        },
+        onDone: () {
+          _currentSubscriptions!.remove(fastModel);
+          _finalizeAssistantMessage();
+        },
+        onError: (error) {
+          _currentSubscriptions!.remove(fastModel);
+          _finalizeAssistantMessage();
+        },
+      ),
+    };
   }
 
   void _sendParallelPrompt(String prompt, List<Message> messages) {

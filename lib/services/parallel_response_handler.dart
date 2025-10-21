@@ -189,8 +189,7 @@ class ParallelResponseHandler {
       // If the message is from the assistant and its main content is empty,
       // it means it's a container for multiple model responses.
       // We need to find the content from the specific model we are querying.
-      if (m.role == MessageRole.assistant &&
-          (content == null || content.isEmpty) &&
+      if (m.role == MessageRole.assistant && content.isEmpty &&
           m.responses != null &&
           m.responses!.isNotEmpty) {
         // For follow-up prompts, we are targeting a single model.

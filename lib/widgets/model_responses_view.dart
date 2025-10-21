@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:okara_chat/models/message.dart';
 import 'package:okara_chat/models/model_response.dart';
 import 'package:okara_chat/providers/chat_state_provider.dart';
 import 'package:okara_chat/services/ai_gateway_service.dart';
