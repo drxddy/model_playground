@@ -34,36 +34,41 @@ class ModelResponseCard extends StatelessWidget {
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  _getModelName(response.model, isFast: isFast),
-                  style: theme.textTheme.navTitleTextStyle.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.primaryColor,
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _getModelName(response.model, isFast: isFast),
+                    style: theme.textTheme.navTitleTextStyle.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.primaryColor,
+                      fontFamily: 'Poly',
+                    ),
                   ),
-                ),
-                if (isFast)
-                  const Icon(
-                    CupertinoIcons.bolt_fill,
-                    color: CupertinoColors.systemYellow,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8.0),
-            AnimatedCrossFade(
-              firstChild: _buildPreviewContent(context),
-              secondChild: _buildExpandedContent(context),
-              crossFadeState: isExpanded
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
-              duration: const Duration(milliseconds: 300),
-            ),
-          ],
+                  if (isFast)
+                    const Icon(
+                      CupertinoIcons.bolt_fill,
+                      color: CupertinoColors.systemYellow,
+                    ),
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              AnimatedCrossFade(
+                firstChild: _buildPreviewContent(context),
+                secondChild: _buildExpandedContent(context),
+                crossFadeState: isExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 300),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -74,9 +79,7 @@ class ModelResponseCard extends StatelessWidget {
       response.content,
       maxLines: 8,
       overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-        color: CupertinoColors.black.withOpacity(0.8),
-      ),
+      style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
     );
   }
 
@@ -86,9 +89,7 @@ class ModelResponseCard extends StatelessWidget {
       children: [
         GptMarkdown(
           response.content,
-          style: TextStyle(
-            color: CupertinoColors.black.withOpacity(0.8),
-          ),
+          style: TextStyle(color: CupertinoColors.black.withOpacity(0.8)),
         ),
         const SizedBox(height: 16.0),
         _buildMetrics(context),

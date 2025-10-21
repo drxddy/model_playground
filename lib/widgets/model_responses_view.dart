@@ -3,9 +3,12 @@ import 'package:okara_chat/models/model_response.dart';
 import 'package:okara_chat/widgets/model_response_card.dart';
 
 class ModelResponsesView extends StatefulWidget {
+  final int index;
   final Map<AIModel, ModelResponse> responses;
 
-  const ModelResponsesView({super.key, required this.responses});
+  const ModelResponsesView({super.key, 
+  required this.index,
+  required this.responses});
 
   @override
   State<ModelResponsesView> createState() => _ModelResponsesViewState();
@@ -38,13 +41,39 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
     });
   }
 
+  Alignment get _alignment {
+    if (widget.index == 0) {
+      return Alignment.topLeft;
+    } else if (widget.index == 1) {
+      return Alignment.topCenter;
+    } else {
+      return Alignment.topRight;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_expandedModel == null) {
-      return _buildPreviewLayout();
-    } else {
-      return _buildExpandedLayout();
-    }
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      layoutBuilder: (currentChild, previousChildren) {
+        return Stack(
+          children: [if (currentChild != null) currentChild],
+        );
+      },
+      transitionBuilder: (Widget child, Animation<double> animation) {
+        return FadeTransition(
+          opacity: animation,
+          child: ScaleTransition(
+            alignment: _alignment,
+            scale: animation,
+            child: child,
+          ),
+        );
+      },
+      child: _expandedModel == null
+          ? _buildPreviewLayout()
+          : _buildExpandedLayout(),
+    );
   }
 
   Widget _buildPreviewLayout() {

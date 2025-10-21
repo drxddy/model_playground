@@ -65,7 +65,9 @@ class ChatScreen extends ConsumerWidget {
                     messages.length + (currentResponses.isNotEmpty ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (index == messages.length && currentResponses.isNotEmpty) {
-                    return ModelResponsesView(responses: currentResponses);
+                    return ModelResponsesView(
+                      index: index,
+                      responses: currentResponses);
                   }
 
                   final message = messages[index];
@@ -89,7 +91,9 @@ class ChatScreen extends ConsumerWidget {
                     );
                   } else if (message.role == MessageRole.assistant &&
                       message.responses != null) {
-                    return ModelResponsesView(responses: message.responses!);
+                    return ModelResponsesView(
+                        index: index,
+                      responses: message.responses!);
                   }
                   return Container();
                 },
