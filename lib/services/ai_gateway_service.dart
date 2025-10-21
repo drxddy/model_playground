@@ -21,7 +21,7 @@ class AIGatewayService {
       'Content-Type': 'application/json',
     };
     final body = {
-      'model': _getModelIdentifier(model, isFast),
+      'model': _getModelIdentifier(model),
       'messages': messages,
       'stream': true,
       'max_tokens': 1024,
@@ -45,7 +45,7 @@ class AIGatewayService {
       'Content-Type': 'application/json',
     };
     final body = jsonEncode({
-      'model': _getModelIdentifier(model, false),
+      'model': _getModelIdentifier(model),
       'messages': messages,
       'stream': false,
       'max_tokens': 1024,
@@ -90,17 +90,16 @@ class AIGatewayService {
     }
   }
 
-  String _getModelIdentifier(AIModel model, bool isFast) {
-    if (isFast) {
-      return 'groq/llama-3.1-8b-instant';
-    }
+  String _getModelIdentifier(AIModel model) {
     switch (model) {
       case AIModel.openaiGpt4o:
         return 'openai/gpt-4o';
       case AIModel.anthropicClaude:
         return 'anthropic/claude-3-5-sonnet';
       case AIModel.xaiGrok:
-        return 'xai/grok-4';
+        return 'xai/grok-3';
+      case AIModel.groqLlama31Instant:
+        return 'groq/llama-3.1-8b-instant';
     }
   }
 
@@ -117,7 +116,6 @@ class AIGatewayService {
     final body = jsonEncode({
       'model': _getModelIdentifier(
         model,
-        false,
       ), // Always use the specific model
       'messages': messages,
       'stream': isStreaming,

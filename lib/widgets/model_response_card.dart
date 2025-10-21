@@ -94,7 +94,6 @@ class _ModelResponseCardState extends State<ModelResponseCard>
                       Text(
                         _getModelName(
                           widget.response.model,
-                          isFast: widget.isFast,
                         ),
                         style: theme.textTheme.navTitleTextStyle.copyWith(
                           fontWeight: FontWeight.bold,
@@ -202,17 +201,16 @@ class _ModelResponseCardState extends State<ModelResponseCard>
     );
   }
 
-  String _getModelName(AIModel model, {bool isFast = false}) {
-    if (isFast) {
-      return 'Groq Llama 3.1';
-    }
+  String _getModelName(AIModel model) {
     switch (model) {
       case AIModel.openaiGpt4o:
-        return 'GPT-4o';
+        return 'GPT';
       case AIModel.anthropicClaude:
         return 'Claude';
       case AIModel.xaiGrok:
         return 'Grok';
+      case AIModel.groqLlama31Instant:
+        return 'Llama';
     }
   }
 }

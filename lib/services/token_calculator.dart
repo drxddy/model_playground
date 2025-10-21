@@ -31,6 +31,8 @@ class TokenCalculator {
         return ModelPricing(inputPerMillion: 3.0, outputPerMillion: 15.0);
       case AIModel.xaiGrok:
         return ModelPricing(inputPerMillion: 7.0, outputPerMillion: 21.0);
+      case AIModel.groqLlama31Instant:
+        return ModelPricing(inputPerMillion: 2.0, outputPerMillion: 8.0);
     }
   }
 }

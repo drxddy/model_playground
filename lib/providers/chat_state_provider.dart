@@ -109,9 +109,9 @@ class ChatStateNotifier extends StateNotifier<ChatState> {
     );
 
     _currentSubscriptions = {
-      AIModel.xaiGrok: controller.stream.listen(
+      AIModel.groqLlama31Instant: controller.stream.listen(
         (response) {
-          state = state.copyWith(currentResponses: {AIModel.xaiGrok: response});
+          state = state.copyWith(currentResponses: {AIModel.groqLlama31Instant: response});
         },
         onDone: _finalizeAssistantMessage,
         onError: (error) {

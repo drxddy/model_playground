@@ -269,11 +269,13 @@ class _ModelResponsesViewState extends State<ModelResponsesView> {
   String _getModelName(AIModel model) {
     switch (model) {
       case AIModel.openaiGpt4o:
-        return 'GPT-4o';
+        return 'GPT';
       case AIModel.anthropicClaude:
-        return 'Claude 3.5 Sonnet';
+        return 'Claude';
       case AIModel.xaiGrok:
-        return 'Grok-4';
+        return 'Grok';
+      case AIModel.groqLlama31Instant:
+        return 'Llama';
     }
   }
 }

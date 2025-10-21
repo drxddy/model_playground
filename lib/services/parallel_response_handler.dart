@@ -21,7 +21,7 @@ class ParallelResponseHandler {
     required String prompt,
     required List<Message> conversationHistory,
   }) {
-    final models = AIModel.values;
+    final models = AIModel.values.take(3); // Exclude the fast model
     final controllers = {
       for (var model in models) model: StreamController<ModelResponse>(),
     };
@@ -44,7 +44,7 @@ class ParallelResponseHandler {
   }) {
     final controller = StreamController<ModelResponse>();
     _streamModelResponse(
-      model: AIModel.xaiGrok,
+      model: AIModel.groqLlama31Instant,
       prompt: prompt,
       conversationHistory: conversationHistory,
       controller: controller,

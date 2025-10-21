@@ -53,8 +53,10 @@ enum AIModel {
   openaiGpt4o,
   @JsonValue('anthropic/claude-3-5-sonnet')
   anthropicClaude,
-  @JsonValue('x-ai/grok-4')
+  @JsonValue('xai/grok-3')
   xaiGrok,
+  @JsonValue('groq/llama-3.1-8b-instant')
+  groqLlama31Instant,
 }
 
 enum ResponseStatus { loading, streaming, completed, error }

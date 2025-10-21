@@ -38,4 +38,5 @@ const _$AIModelEnumMap = {
   AIModel.openaiGpt4o: 'openai/gpt-4o',
   AIModel.anthropicClaude: 'anthropic/claude-3-5-sonnet',
   AIModel.xaiGrok: 'x-ai/grok-4',
+  AIModel.groqLlama31Instant: 'groq/llama-3.1-8b-instant', 
 };
